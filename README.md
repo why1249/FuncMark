@@ -115,7 +115,7 @@ node test.js
 
 ## 开发文档
 
-- 📖 [如何添加新函数](ADD_NEW_FUNCTION.md) - 详细说明如何扩展 FuncNote 功能
+- 📖 [如何添加新函数](docs/ADD_NEW_FUNCTION.md) - 详细说明如何扩展 FuncNote 功能
 
 ## 技术架构
 
