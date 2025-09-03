@@ -1,0 +1,23 @@
+{
+  "name": "funcnote-prototype",
+  "version": "1.0.0",
+  "description": "FuncNote 函数调用式标记语言原型",
+  "main": "index.html",
+  "scripts": {
+    "test": "node test.js",
+    "start": "npx serve .",
+    "dev": "npx live-server ."
+  },
+  "keywords": [
+    "markup",
+    "note-taking",
+    "parser",
+    "funcnote"
+  ],
+  "author": "FuncNote Team",
+  "license": "MIT",
+  "devDependencies": {
+    "live-server": "^1.2.2",
+    "serve": "^14.2.1"
+  }
+}

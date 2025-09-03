@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FuncNote 原型</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .editor-panel {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #e0e0e0;
+        }
+
+        .preview-panel {
+            width: 50%;
+            display: flex;
+            flex-direction: column;
+            background-color: #fafafa;
+        }
+
+        .panel-header {
+            background-color: #f5f5f5;
+            padding: 10px 15px;
+            border-bottom: 1px solid #e0e0e0;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .editor {
+            flex: 1;
+            border: none;
+            padding: 15px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            resize: none;
+            outline: none;
+        }
+
+        .preview {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+        }
+
+        /* 预览样式 */
+        .func-block {
+            margin-bottom: 15px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .func-head {
+            margin: 20px 0 10px 0;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .func-head.rank-1 { font-size: 28px; }
+        .func-head.rank-2 { font-size: 24px; }
+        .func-head.rank-3 { font-size: 20px; }
+        .func-head.rank-4 { font-size: 18px; }
+        .func-head.rank-5 { font-size: 16px; }
+        .func-head.rank-6 { font-size: 14px; }
+
+        .func-code {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 4px;
+            padding: 15px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            overflow-x: auto;
+        }
+
+        .func-code .code-title {
+            color: #6f42c1;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 12px;
+        }
+
+        .func-code .code-content {
+            color: #333;
+            white-space: pre-wrap;
+        }
+
+        .func-paragraph {
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .func-list {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+
+        .func-list li {
+            margin: 5px 0;
+            line-height: 1.4;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .autocomplete {
+            position: absolute;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 1000;
+            max-width: 300px;
+        }
+
+        .autocomplete-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+        }
+
+        .autocomplete-item:hover {
+            background-color: #f0f0f0;
+        }
+
+        .autocomplete-item:last-child {
+            border-bottom: none;
+        }
+
+        .autocomplete-item.selected {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="editor-panel">
+            <div class="panel-header">编辑器</div>
+            <textarea class="editor" placeholder="输入 FuncNote 语法...&#10;&#10;示例：&#10;@head(text=&quot;标题&quot;, rank=1)&#10;@paragraph(text=&quot;这是一个段落&quot;)&#10;@code(text=&quot;console.log('Hello World')&quot;, language=&quot;javascript&quot;, title=&quot;示例代码&quot;)"></textarea>
+        </div>
+        <div class="preview-panel">
+            <div class="panel-header">实时预览</div>
+            <div class="preview"></div>
+        </div>
+    </div>
+
+    <script src="parser.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
