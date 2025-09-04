@@ -1,6 +1,6 @@
-# FuncNote 原型
+# FuncMark 原型
 
-FuncNote 是一个实验性的函数调用式标记语言，旨在通过函数调用的方式来简化文档编写。
+FuncMark 是一个实验性的函数调用式标记语言，旨在通过函数调用的方式来简化文档编写。
 
 ## 功能特性
 
@@ -21,14 +21,14 @@ FuncNote 是一个实验性的函数调用式标记语言，旨在通过函数�
 ## 语法示例
 
 ### 基本语法
-```funcnote
+```FuncMark
 @head(text="我的文档", rank=1)
 @paragraph(text="这是一个简单的段落。")
 @list(items="项目1|项目2|项目3", type="ul")
 ```
 
 ### 多行语法
-```funcnote
+```FuncMark
 @code(
     text="function hello() {
     console.log('Hello World');
@@ -62,13 +62,15 @@ FuncNote 是一个实验性的函数调用式标记语言，旨在通过函数�
 ## 项目结构
 
 ```
+├── docs                    # 文档
+│   └── ADD_NEW_FUNCTION.md     # 添加新函数指南
 ├── index.html              # 主页面
-├── parser.js               # FuncNote 语法解析器
+├── parser.js               # FuncMark 语法解析器
 ├── app.js                  # 前端应用逻辑
 ├── test.js                 # 解析器测试
 ├── package.json            # 项目配置
-├── README.md               # 项目说明
-└── ADD_NEW_FUNCTION.md     # 添加新函数指南
+└── README.md               # 项目说明
+
 ```
 
 ## 解析器测试
@@ -91,7 +93,7 @@ node test.js
 
 ## 使用说明
 
-1. **编辑区域**: 在左侧编辑器中输入 FuncNote 语法
+1. **编辑区域**: 在左侧编辑器中输入 FuncMark 语法
 2. **实时预览**: 右侧会实时显示渲染结果
 3. **自动补全**: 输入 `@` 会触发函数名自动补全
 4. **错误提示**: 语法错误会在预览区域显示错误信息
@@ -115,7 +117,7 @@ node test.js
 
 ## 开发文档
 
-- 📖 [如何添加新函数](docs/ADD_NEW_FUNCTION.md) - 详细说明如何扩展 FuncNote 功能
+- 📖 [如何添加新函数](docs/ADD_NEW_FUNCTION.md) - 详细说明如何扩展 FuncMark 功能
 
 ## 技术架构
 
@@ -125,6 +127,6 @@ node test.js
 
 ## 开发说明
 
-本项目是 FuncNote 概念的早期原型，主要用于验证函数调用式标记语言的可行性。代码结构简单，易于理解和扩展。
+本项目是 FuncMark 概念的早期原型，主要用于验证函数调用式标记语言的可行性。代码结构简单，易于理解和扩展。
 
 如有问题或建议，欢迎提出！

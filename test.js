@@ -91,7 +91,7 @@ class FuncNoteParserTest {
     }
 
     runTests() {
-        console.log('=== FuncNote 解析器测试 ===\n');
+        console.log('=== FuncMark 解析器测试 ===\n');
         
         let passed = 0;
         let failed = 0;

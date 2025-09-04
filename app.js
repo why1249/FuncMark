@@ -27,9 +27,9 @@ class FuncNoteApp {
     }
 
     setExampleContent() {
-        const example = `@head(text="FuncNote 示例文档", rank=1)
+        const example = `@head(text="FuncMark 示例文档", rank=1)
 
-@paragraph(text="这是一个使用 FuncNote 语法编写的示例文档。")
+@paragraph(text="这是一个使用 FuncMark 语法编写的示例文档。")
 
 @head(text="功能特点", rank=2)
 
@@ -39,8 +39,8 @@ class FuncNoteApp {
 
 @code(
     text="function hello() {
-    console.log('Hello, FuncNote!');
-    return 'Welcome to FuncNote';
+    console.log('Hello, FuncMark!');
+    return 'Welcome to FuncMark';
 }",
     language="javascript",
     title="JavaScript 示例"
@@ -50,7 +50,7 @@ class FuncNoteApp {
 
 @list(items="输入 @ 触发自动补全|选择函数并填写参数|查看右侧实时预览|保存或导出结果", type="ol")
 
-@paragraph(text="FuncNote 支持实时预览，您可以在左侧编辑，右侧会实时显示渲染结果。")`;
+@paragraph(text="FuncMark 支持实时预览，您可以在左侧编辑，右侧会实时显示渲染结果。")`;
 
         this.editor.value = example;
         this.render();

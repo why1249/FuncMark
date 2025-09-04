@@ -1,7 +1,7 @@
 {
-  "name": "funcnote-prototype",
+  "name": "funcmark-prototype",
   "version": "1.0.0",
-  "description": "FuncNote 函数调用式标记语言原型",
+  "description": "FuncMark 函数调用式标记语言原型",
   "main": "index.html",
   "scripts": {
     "test": "node test.js",
@@ -12,9 +12,9 @@
     "markup",
     "note-taking",
     "parser",
-    "funcnote"
+    "funcmark"
   ],
-  "author": "FuncNote Team",
+  "author": "FuncMark Team",
   "license": "MIT",
   "devDependencies": {
     "live-server": "^1.2.2",
