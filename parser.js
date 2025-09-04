@@ -2,7 +2,7 @@
  * FuncNote 语法解析器
  * 解析 @function(parameters) 格式的函数调用
  */
-class FuncNoteParser {
+class FuncMarkParser {
     constructor() {
         // 支持的函数定义
         this.functions = {
@@ -279,5 +279,5 @@ class FuncNoteParser {
 
 // 导出供其他文件使用
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = FuncNoteParser;
+    module.exports = FuncMarkParser;
 }

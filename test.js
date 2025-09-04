@@ -3,17 +3,17 @@
  */
 
 // 在 Node.js 环境中运行测试
-let FuncNoteParser;
+let FuncMarkParser;
 if (typeof require !== 'undefined') {
-    FuncNoteParser = require('./parser.js');
+    FuncMarkParser = require('./parser.js');
 } else {
-    // 浏览器环境中，FuncNoteParser 应该已经在全局作用域中
-    FuncNoteParser = window.FuncNoteParser;
+    // 浏览器环境中，FuncMarkParser 应该已经在全局作用域中
+    FuncMarkParser = window.FuncMarkParser;
 }
 
-class FuncNoteParserTest {
+class FuncMarkParserTest {
     constructor() {
-        this.parser = new FuncNoteParser();
+        this.parser = new FuncMarkParser();
         this.testCases = [
             {
                 name: '基本标题解析',
@@ -182,16 +182,16 @@ class FuncNoteParserTest {
 
 // 如果在浏览器环境中，添加到全局对象
 if (typeof window !== 'undefined') {
-    window.FuncNoteParserTest = FuncNoteParserTest;
+    window.FuncMarkParserTest = FuncMarkParserTest;
 }
 
 // 如果在 Node.js 环境中，直接运行测试
 if (typeof require !== 'undefined' && require.main === module) {
-    const test = new FuncNoteParserTest();
+    const test = new FuncMarkParserTest();
     test.runTests();
 }
 
 // 导出供其他文件使用
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = FuncNoteParserTest;
+    module.exports = FuncMarkParserTest;
 }

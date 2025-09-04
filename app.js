@@ -2,9 +2,9 @@
  * FuncNote 应用程序主文件
  * 处理编辑器交互和实时预览
  */
-class FuncNoteApp {
+class FuncMarkApp {
     constructor() {
-        this.parser = new FuncNoteParser();
+        this.parser = new FuncMarkParser();
         this.editor = document.querySelector('.editor');
         this.preview = document.querySelector('.preview');
         this.autocompleteContainer = null;
@@ -323,5 +323,5 @@ class FuncNoteApp {
 
 // 当页面加载完成时初始化应用
 document.addEventListener('DOMContentLoaded', () => {
-    new FuncNoteApp();
+    new FuncMarkApp();
 });
