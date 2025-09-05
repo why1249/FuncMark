@@ -12,11 +12,11 @@
 > 阶段 0.1 已完成 ✅
 
 阶段 0.2（可扩展内核准备）
-- [ ] DOM 渲染抽象（renderer/DOMRenderer）
-- [ ] 新函数 image
-- [ ] 新函数 table（最简：rows="a,b|c,d"）
-- [ ] 自动补全：参数占位与提示
-- [ ] 函数 schema 文档自动生成 (scripts/gen-functions-doc.js)
+- [x] DOM 渲染抽象（renderer/DOMRenderer）
+- [x] 新函数 image
+- [x] 新函数 table（最简：rows="a,b|c,d"）
+- [x] 自动补全：参数占位与提示
+- [x] 函数 schema 文档自动生成 (scripts/gen-functions-doc.js)
 
 阶段 0.3（功能增强）
 - [ ] 导出：AST -> JSON

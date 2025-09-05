@@ -22,6 +22,16 @@ const functionSchemas = {
     params: ['items', 'type'],
     defaults: { type: 'ul' },
     description: '列表，type=ul|ol，items 用 | 或 换行分隔'
+  },
+  image: {
+    params: ['src', 'alt', 'width', 'height'],
+    defaults: { alt: '', width: '', height: '' },
+    description: '图片，支持可选宽高(px)'
+  },
+  table: {
+    params: ['rows', 'header', 'align'],
+    defaults: { header: 'false', align: '' },
+    description: '表格，rows="a,b|c,d" header=true/false align="l,c,r" (列对齐,逗号分隔)'
   }
 };
 
@@ -34,7 +44,15 @@ function getFunctionList() {
   }));
 }
 
-module.exports = {
-  functionSchemas,
-  getFunctionList
-};
+if (typeof module !== 'undefined' && module.exports) {
+  module.exports = {
+    functionSchemas,
+    getFunctionList
+  };
+}
+
+// 浏览器环境暴露
+if (typeof window !== 'undefined') {
+  window.FuncMarkFunctionSchemas = functionSchemas;
+  window.FuncMarkGetFunctionList = getFunctionList;
+}

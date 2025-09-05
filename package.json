@@ -4,7 +4,8 @@
   "description": "FuncMark 函数调用式标记语言原型",
   "main": "index.html",
   "scripts": {
-    "test": "nyc --reporter=text --reporter=html node test.js",
+  "test": "nyc --reporter=text --reporter=html node test.js",
+  "gen:functions": "node scripts/gen-functions-doc.js",
     "start": "npx serve .",
     "dev": "npx live-server ."
   },

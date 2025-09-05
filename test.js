@@ -144,6 +144,22 @@ class FuncMarkParserTest {
                     { type: 'paragraph', params: { text: '第一行' } },
                     { type: 'paragraph', params: { text: '第二行' } }
                 ]
+            },
+            {
+                name: '图片函数解析',
+                input: '@image(src="test.jpg", alt="示例", width="300")',
+                expected: {
+                    type: 'image',
+                    params: { src: 'test.jpg', alt: '示例', width: '300', height: '' }
+                }
+            },
+            {
+                name: '表格函数解析',
+                input: '@table(rows="A,B|C,D", header=true, align="l,c")',
+                expected: {
+                    type: 'table',
+                    params: { rows: 'A,B|C,D', header: 'true', align: 'l,c' }
+                }
             }
         ];
     }

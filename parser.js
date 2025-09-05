@@ -9,13 +9,17 @@ class FuncMarkParser {
             const { functionSchemas } = require('./core/functions.js');
             this.functions = functionSchemas;
         } catch (e) {
-            // 浏览器环境兜底（仍保留旧结构, 避免加载失败）
-            this.functions = {
-                head: { params: ['text', 'rank'], defaults: { rank: 1 } },
-                code: { params: ['text', 'language', 'title'], defaults: { language: '', title: '' } },
-                paragraph: { params: ['text'], defaults: {} },
-                list: { params: ['items', 'type'], defaults: { type: 'ul' } }
-            };
+            if (typeof window !== 'undefined' && window.FuncMarkFunctionSchemas) {
+                this.functions = window.FuncMarkFunctionSchemas;
+            } else {
+                // 最小兜底（不含 image）
+                this.functions = {
+                    head: { params: ['text', 'rank'], defaults: { rank: 1 } },
+                    code: { params: ['text', 'language', 'title'], defaults: { language: '', title: '' } },
+                    paragraph: { params: ['text'], defaults: {} },
+                    list: { params: ['items', 'type'], defaults: { type: 'ul' } }
+                };
+            }
         }
 
         // 错误构造工具
@@ -337,8 +341,8 @@ class FuncMarkParser {
 
         const func = this.functions[functionName];
         const params = func.params.map(param => {
-            const defaultValue = func.defaults[param] || '';
-            return `    ${param}="${defaultValue}"`;
+            const defaultValue = func.defaults[param] !== undefined ? func.defaults[param] : '';
+            return `    ${param}="${defaultValue}"`; // 可进一步加 :type
         }).join(',\n');
 
         return `@${functionName}(\n${params}\n)`;
