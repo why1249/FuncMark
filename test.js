@@ -14,13 +14,21 @@ if (typeof require !== 'undefined') {
 class FuncMarkParserTest {
     constructor() {
         this.parser = new FuncMarkParser();
-        this.testCases = [
+    this.testCases = [
             {
                 name: '基本标题解析',
                 input: '@head(text="测试标题", rank=1)',
                 expected: {
                     type: 'head',
                     params: { text: '测试标题', rank: 1 }
+                }
+            },
+            {
+                name: '参数格式错误',
+                input: '@head(text"缺少等号")',
+                expected: {
+                    type: 'error',
+                    message: '参数格式错误'
                 }
             },
             {
@@ -68,7 +76,16 @@ class FuncMarkParserTest {
                 input: '@invalid(text="test")',
                 expected: {
                     type: 'error',
-                    message: '不支持的函数: invalid'
+                    code: 'FM001',
+                    message: '不支持的函数'
+                }
+            },
+            {
+                name: '未闭合函数调用',
+                input: '@head(text="未闭合"',
+                expected: {
+                    type: 'error',
+                    message: '未闭合的函数调用'
                 }
             },
             {
@@ -86,6 +103,47 @@ class FuncMarkParserTest {
                     type: 'list',
                     params: { items: '第一步|第二步|第三步', type: 'ol' }
                 }
+            },
+            {
+                name: '忽略未知参数',
+                input: '@head(text="标题", rank=2, extra="x")',
+                expected: {
+                    type: 'head',
+                    params: { text: '标题', rank: 2 }
+                }
+            },
+            {
+                name: '多行代码块保留换行',
+                input: `@code(\n    text="line1\\nline2\\nline3",\n    language="js",\n    title="多行"\n)`,
+                expected: {
+                    type: 'code',
+                    params: { text: 'line1\nline2\nline3', language: 'js', title: '多行' }
+                }
+            },
+            {
+                name: '换行分隔列表',
+                input: '@list(items="A\\nB\\nC", type="ul")',
+                expected: {
+                    type: 'list',
+                    params: { items: 'A\nB\nC', type: 'ul' }
+                }
+            },
+            {
+                name: '定位信息',
+                input: '\n@paragraph(text="段落")',
+                expected: {
+                    type: 'paragraph',
+                    params: { text: '段落' },
+                    loc: { line: 2 }
+                }
+            },
+            {
+                name: '连续普通文本行',
+                input: '第一行\n第二行',
+                expectedArray: [
+                    { type: 'paragraph', params: { text: '第一行' } },
+                    { type: 'paragraph', params: { text: '第二行' } }
+                ]
             }
         ];
     }
@@ -99,8 +157,20 @@ class FuncMarkParserTest {
         this.testCases.forEach((testCase, index) => {
             try {
                 const result = this.parser.parse(testCase.input);
-                const actual = result[0]; // 取第一个结果
-
+                if (testCase.expectedArray) {
+                    const pass = this.compareArrayResults(result, testCase.expectedArray);
+                    if (pass) {
+                        console.log(`✅ 测试 ${index + 1}: ${testCase.name}`);
+                        passed++;
+                    } else {
+                        console.log(`❌ 测试 ${index + 1}: ${testCase.name}`);
+                        console.log('   期望数组:', testCase.expectedArray);
+                        console.log('   实际数组:', result.map(r => ({ type: r.type, params: r.params })));
+                        failed++;
+                    }
+                    return;
+                }
+                const actual = result[0];
                 if (this.compareResults(actual, testCase.expected)) {
                     console.log(`✅ 测试 ${index + 1}: ${testCase.name}`);
                     passed++;
@@ -125,22 +195,23 @@ class FuncMarkParserTest {
     }
 
     compareResults(actual, expected) {
-        if (actual.type !== expected.type) {
-            return false;
-        }
-
-        if (expected.message) {
-            return actual.message && actual.message.includes(expected.message.split(':')[0]);
-        }
-
+        if (!actual || actual.type !== expected.type) return false;
+        if (expected.code && actual.code !== expected.code) return false;
+        if (expected.message && !(actual.message && actual.message.includes(expected.message))) return false;
         if (expected.params) {
             for (const key in expected.params) {
-                if (actual.params[key] !== expected.params[key]) {
-                    return false;
-                }
+                if (actual.params[key] !== expected.params[key]) return false;
             }
         }
+        if (expected.loc && expected.loc.line && (!actual.loc || actual.loc.line !== expected.loc.line)) return false;
+        return true;
+    }
 
+    compareArrayResults(actualArr, expectedArr) {
+        if (!Array.isArray(actualArr) || actualArr.length !== expectedArr.length) return false;
+        for (let i = 0; i < expectedArr.length; i++) {
+            if (!this.compareResults(actualArr[i], expectedArr[i])) return false;
+        }
         return true;
     }
 

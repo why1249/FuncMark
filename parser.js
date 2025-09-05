@@ -4,25 +4,29 @@
  */
 class FuncMarkParser {
     constructor() {
-        // 支持的函数定义
-        this.functions = {
-            head: {
-                params: ['text', 'rank'],
-                defaults: { rank: 1 }
-            },
-            code: {
-                params: ['text', 'language', 'title'],
-                defaults: { language: '', title: '' }
-            },
-            paragraph: {
-                params: ['text'],
-                defaults: {}
-            },
-            list: {
-                params: ['items', 'type'],
-                defaults: { type: 'ul' }
-            }
-        };
+        // 引入外部函数 schema
+        try {
+            const { functionSchemas } = require('./core/functions.js');
+            this.functions = functionSchemas;
+        } catch (e) {
+            // 浏览器环境兜底（仍保留旧结构, 避免加载失败）
+            this.functions = {
+                head: { params: ['text', 'rank'], defaults: { rank: 1 } },
+                code: { params: ['text', 'language', 'title'], defaults: { language: '', title: '' } },
+                paragraph: { params: ['text'], defaults: {} },
+                list: { params: ['items', 'type'], defaults: { type: 'ul' } }
+            };
+        }
+
+        // 错误构造工具
+        try {
+            const { ErrorCodes, buildError } = require('./core/errors.js');
+            this.ErrorCodes = ErrorCodes;
+            this.buildError = buildError;
+        } catch (e) {
+            this.ErrorCodes = { UNKNOWN_FUNCTION: 'FM001', SYNTAX_ERROR: 'FM000' };
+            this.buildError = (code, message, loc) => ({ type: 'error', code, message, loc });
+        }
     }
 
     /**
@@ -32,52 +36,106 @@ class FuncMarkParser {
      */
     parse(input) {
         const results = [];
+        // 先用 tokenizer 拿到行级 token
+        let tokens = [];
+        try {
+            const { tokenize } = require('./core/tokenizer.js');
+            tokens = tokenize(input);
+        } catch { // 浏览器模式尝试全局
+            if (typeof tokenize === 'function') {
+                tokens = tokenize(input);
+            } else {
+                // fallback: 原逻辑
+                return this.legacyParse(input);
+            }
+        }
+
         const lines = input.split('\n');
-        let currentBlock = null;
         let inMultiLineCall = false;
         let blockContent = '';
         let parenCount = 0;
+        let blockStartLine = 0;
 
         for (let i = 0; i < lines.length; i++) {
-            const line = lines[i].trim();
-            
+            const rawLine = lines[i];
+            const line = rawLine.trim();
+            const lineNumber = i + 1;
+
             if (line.startsWith('@') && !inMultiLineCall) {
-                // 检查是否是完整的单行调用
                 if (this.isCompleteFunctionCall(line)) {
-                    results.push(this.parseBlock(line));
+                    results.push(this.parseBlock(line, { line: lineNumber }));
                 } else if (line.includes('(')) {
-                    // 开始多行函数调用
                     inMultiLineCall = true;
                     blockContent = line;
                     parenCount = this.countParens(line);
+                    blockStartLine = lineNumber;
                 } else {
-                    results.push({ type: 'error', message: `语法错误: ${line}` });
+                    results.push(this.buildError(this.ErrorCodes.SYNTAX_ERROR, `语法错误: ${line}`, { line: lineNumber, column: 1 }));
                 }
             } else if (inMultiLineCall) {
-                blockContent += '\n' + lines[i]; // 保持原始格式
-                parenCount += this.countParens(lines[i]);
-                
-                // 检查是否结束了多行调用
+                blockContent += '\n' + rawLine; // 保留原格式
+                parenCount += this.countParens(rawLine);
                 if (parenCount <= 0) {
                     inMultiLineCall = false;
-                    results.push(this.parseBlock(blockContent));
+                    results.push(this.parseBlock(blockContent, { line: blockStartLine }));
                     blockContent = '';
                     parenCount = 0;
                 }
             } else if (line.length > 0) {
-                // 处理普通文本
                 results.push({
                     type: 'paragraph',
-                    params: { text: line }
+                    params: { text: line },
+                    loc: { line: lineNumber }
                 });
             }
         }
 
-        // 处理最后一个未完成的块
         if (inMultiLineCall && blockContent) {
-            results.push(this.parseBlock(blockContent));
+            // 未闭合括号
+            results.push(this.buildError(this.ErrorCodes.UNCLOSED_PAREN || 'FM003', '未闭合的函数调用', { line: blockStartLine }));
         }
 
+        return results;
+    }
+
+    // 旧解析逻辑兜底（极端情况下使用）
+    legacyParse(input) {
+        const lines = input.split('\n');
+        const results = [];
+        let inMultiLineCall = false;
+        let blockContent = '';
+        let parenCount = 0;
+        let blockStartLine = 0;
+        for (let i = 0; i < lines.length; i++) {
+            const rawLine = lines[i];
+            const line = rawLine.trim();
+            const lineNumber = i + 1;
+            if (line.startsWith('@') && !inMultiLineCall) {
+                if (this.isCompleteFunctionCall(line)) {
+                    results.push(this.parseBlock(line, { line: lineNumber }));
+                } else if (line.includes('(')) {
+                    inMultiLineCall = true;
+                    blockContent = line;
+                    parenCount = this.countParens(line);
+                    blockStartLine = lineNumber;
+                } else {
+                    results.push(this.buildError(this.ErrorCodes.SYNTAX_ERROR, `语法错误: ${line}`, { line: lineNumber }));
+                }
+            } else if (inMultiLineCall) {
+                blockContent += '\n' + rawLine;
+                parenCount += this.countParens(rawLine);
+                if (parenCount <= 0) {
+                    inMultiLineCall = false;
+                    results.push(this.parseBlock(blockContent, { line: blockStartLine }));
+                    blockContent = '';
+                }
+            } else if (line.length > 0) {
+                results.push({ type: 'paragraph', params: { text: line }, loc: { line: lineNumber } });
+            }
+        }
+        if (inMultiLineCall && blockContent) {
+            results.push(this.buildError(this.ErrorCodes.UNCLOSED_PAREN || 'FM003', '未闭合的函数调用', { line: blockStartLine }));
+        }
         return results;
     }
 
@@ -142,39 +200,44 @@ class FuncMarkParser {
     /**
      * 解析单个函数块
      */
-    parseBlock(content) {
+    parseBlock(content, loc) {
         try {
             // 提取函数名
             const functionMatch = content.match(/@(\w+)\s*\(/);
             if (!functionMatch) {
-                return { type: 'error', message: '无法识别的函数格式' };
+                return this.buildError(this.ErrorCodes.SYNTAX_ERROR, '无法识别的函数格式', loc);
             }
 
             const functionName = functionMatch[1];
             
             // 检查函数是否支持
             if (!this.functions[functionName]) {
-                return { type: 'error', message: `不支持的函数: ${functionName}` };
+                return this.buildError(this.ErrorCodes.UNKNOWN_FUNCTION, `不支持的函数: ${functionName}` , loc);
             }
 
             // 提取参数部分
             const paramsMatch = content.match(/@\w+\s*\(([\s\S]*)\)/);
             if (!paramsMatch) {
-                return { type: 'error', message: '参数格式错误' };
+                return this.buildError(this.ErrorCodes.PARAM_FORMAT_ERROR || 'FM002', '参数格式错误', loc);
             }
 
             const paramsString = paramsMatch[1];
-            const params = this.parseParameters(paramsString);
-            
+            const parseResult = this.parseParameters(paramsString);
+            if (parseResult.invalid) {
+                return this.buildError(this.ErrorCodes.PARAM_FORMAT_ERROR || 'FM002', '参数格式错误', loc);
+            }
+            const params = parseResult.params;
+
             // 验证参数
             const validatedParams = this.validateParameters(functionName, params);
             
             return {
                 type: functionName,
-                params: validatedParams
+                params: validatedParams,
+                loc
             };
         } catch (error) {
-            return { type: 'error', message: `解析错误: ${error.message}` };
+            return this.buildError(this.ErrorCodes.SYNTAX_ERROR, `解析错误: ${error.message}`, loc);
         }
     }
 
@@ -183,34 +246,39 @@ class FuncMarkParser {
      */
     parseParameters(paramsString) {
         const params = {};
-        
         if (!paramsString.trim()) {
-            return params;
+            return { params, invalid: false };
         }
 
-        // 移除换行符并规范化空格，但要小心字符串内容
-        let normalized = paramsString.replace(/\s*\n\s*/g, ' ').trim();
-        
-        // 改进的参数解析：先找到所有的键值对
+        let normalized = paramsString
+            .replace(/\n+/g, '\n')
+            .replace(/\n\s+/g, ' ')
+            .trim();
+
         const regex = /(\w+)\s*=\s*("(?:[^"\\]|\\.|[\n\r])*?"|'(?:[^'\\]|\\.|[\n\r])*?'|\w+)(?:\s*,|$)/g;
         let match;
-        
+        let consumedSpans = [];
         while ((match = regex.exec(normalized)) !== null) {
             const key = match[1];
             let value = match[2];
-            
-            // 清理值
-            if ((value.startsWith('"') && value.endsWith('"')) || 
-                (value.startsWith("'") && value.endsWith("'"))) {
+            if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
                 value = value.slice(1, -1);
+                value = value.replace(/\\n/g, '\n').replace(/\\t/g, '\t');
             } else if (/^\d+$/.test(value)) {
                 value = parseInt(value);
             }
-            
             params[key] = value;
+            consumedSpans.push({ start: match.index, end: match.index + match[0].length });
         }
-        
-        return params;
+
+        // 计算剩余未匹配字符（去掉逗号与空白后仍存在则为格式错误）
+        let remainderMask = normalized.split('');
+        consumedSpans.forEach(span => {
+            for (let i = span.start; i < span.end; i++) remainderMask[i] = ' ';
+        });
+        const remainder = remainderMask.join('').replace(/[\s,]/g, '');
+        const invalid = remainder.length > 0;
+        return { params, invalid };
     }
 
     /**

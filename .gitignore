@@ -1,0 +1,46 @@
+# Node / Runtime
+node_modules/
+.npm/
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Build / Dist
+dist/
+build/
+out/
+*.tsbuildinfo
+
+# Temp / Cache
+tmp/
+temp/
+*.tmp
+*.swp
+*.swo
+.cache/
+
+# Env
+.env
+.env.*.local
+.env.local
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Archives
+*.tgz
+*.zip
+
+# Generated docs (未来如有)
+docs/generated/

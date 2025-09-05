@@ -118,11 +118,14 @@ node test.js
 ## 开发文档
 
 - 📖 [如何添加新函数](docs/ADD_NEW_FUNCTION.md) - 详细说明如何扩展 FuncMark 功能
+- 🛠️ [开发计划](docs/DEVELOPMENT_PLAN.md) - 项目阶段性路线与任务拆解
 
 ## 技术架构
 
 - **前端**: 纯 HTML/CSS/JavaScript，无框架依赖
-- **解析器**: 基于正则表达式和状态机的自定义解析器
+- **解析器**: 行级 tokenizer + 括号计数的轻量解析（将逐步演进为 tokens -> AST 流）
+- **AST**: 已引入基础节点占位（见 `core/ast.js`），函数节点含 loc 信息，后续用于导出与高级语义
+- **函数 Schema**: 内置函数定义集中在 `core/functions.js`，便于扩展与自动补全
 - **实时预览**: 基于 DOM 操作的实时渲染
 
 ## 开发说明
